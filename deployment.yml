@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: talles2512/meubanco:1.1
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: banco
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: banco
+        persistentVolumeClaim:
+          claimName: banco
+  
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php
+  labels:
+    app: php
+spec:
+  selector:
+    matchLabels:
+      app: php
+  template:
+    metadata:
+      labels:
+        app: php
+    spec:
+      containers:
+      - name: php
+        image: talles2512/php:1.0
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: app
+          mountPath: /usr/local/apache2/htdocs
+      volumes:
+      - name: app
+        persistentVolumeClaim:
+          claimName: app
